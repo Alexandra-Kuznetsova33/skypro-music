@@ -1,0 +1,11 @@
+.filter__item {
+  color: #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter__item:hover {
+  color: #b672ff;
+  text-decoration: underline;
+  transition: color 0.5s ease;
+}
