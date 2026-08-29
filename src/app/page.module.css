@@ -11,6 +11,8 @@
   margin: 0 auto;
   position: relative;
   background-color: #181818;
+  display: flex;
+  flex-direction: column;  
 }
 
 .main {
@@ -20,9 +22,12 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
+  padding-bottom: 60px;
+  min-height: 0;  
+  overflow: hidden; 
 }

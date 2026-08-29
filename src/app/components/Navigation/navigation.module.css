@@ -2,6 +2,7 @@
   width: 244px;
   background-color: #181818;
   padding: 20px 0 20px 36px;
+  flex-shrink: 0;
 }
 
 .nav__logo {
