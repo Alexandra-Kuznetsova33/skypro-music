@@ -17,17 +17,20 @@ export default function Navigation() {
           className={styles.logo__image}
           src="/img/logo.png"
           alt="logo"
+          priority
         />
       </div>
       <div
         className={styles.nav__burger}
-        onClick={() => setIsMenuOpen(prev => !prev)}
+        onClick={() => setIsMenuOpen((prev) => !prev)}
       >
         <span className={styles.burger__line}></span>
         <span className={styles.burger__line}></span>
         <span className={styles.burger__line}></span>
       </div>
-      <div className={`${styles.nav__menu} ${!isMenuOpen ? styles.hidden : ''}`}>
+      <div
+        className={`${styles.nav__menu} ${!isMenuOpen ? styles.hidden : ''}`}
+      >
         <ul className={styles.menu__list}>
           <li className={styles.menu__item}>
             <Link href="/" className={styles.menu__link}>

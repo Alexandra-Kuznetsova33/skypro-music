@@ -10,3 +10,9 @@ export interface TrackType {
   track_file: string;
   stared_user: string[];
 }
+
+export interface PlayerState {
+  currentTrack: TrackType | null;
+  isPlaying: boolean;
+  isPlayerVisible: boolean;
+}

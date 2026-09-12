@@ -1,4 +1,5 @@
 import { Montserrat } from 'next/font/google';
+import ReduxProvider from './ReduxProvider';
 import './globals.css';
 
 const montserrat = Montserrat({
@@ -13,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ru" className={montserrat.className}>
-      <body>{children}</body>
+    <html lang="ru" className={montserrat.className} suppressHydrationWarning>
+      <body><ReduxProvider>{children}</ReduxProvider></body>
     </html>
   )
 }

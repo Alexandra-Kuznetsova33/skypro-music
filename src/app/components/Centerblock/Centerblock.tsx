@@ -111,9 +111,7 @@ export default function Centerblock({ tracks }: CenterblockProps) {
           {tracks.map((track) => (
             <TrackItem
               key={track._id}
-              title={track.name}
-              author={track.author}
-              album={track.album}
+              track={track}
               time={formatDuration(track.duration_in_seconds)}
             />
           ))}
