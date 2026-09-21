@@ -15,4 +15,8 @@ export interface PlayerState {
   currentTrack: TrackType | null;
   isPlaying: boolean;
   isPlayerVisible: boolean;
+  playlist: TrackType[];
+  shuffle: boolean;
+  loop: boolean;
+  volume: number;
 }

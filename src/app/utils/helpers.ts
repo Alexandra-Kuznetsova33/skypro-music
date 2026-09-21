@@ -1,8 +1,9 @@
 import { TrackType } from '../sharedTypes/types';
 
 export function formatDuration(seconds: number): string {
+  if (!seconds || isNaN(seconds) || seconds < 0) return '0:00';
   const minutes = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+  const secs = Math.floor(seconds % 60);
   return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 
