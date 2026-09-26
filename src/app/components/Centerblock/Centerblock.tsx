@@ -20,9 +20,10 @@ type FilterKey = 'author' | 'year' | 'genre' | null;
 
 interface CenterblockProps {
   tracks: TrackType[];
+  title?: string;
 }
 
-export default function Centerblock({ tracks }: CenterblockProps) {
+export default function Centerblock({ tracks, title = 'Треки' }: CenterblockProps) {
   const [activeFilter, setActiveFilter] = useState<FilterKey>(null);
 
   const toggleFilter = (filter: Exclude<FilterKey, null>) => {
@@ -39,7 +40,7 @@ export default function Centerblock({ tracks }: CenterblockProps) {
     <div className={styles.centerblock}>
       <Search />
 
-      <h2 className={styles.centerblock__h2}>Треки</h2>
+      <h2 className={styles.centerblock__h2}>{title}</h2>
 
       <div className={styles.centerblock__filter}>
         <div className={styles.filter__title}>Искать по:</div>
