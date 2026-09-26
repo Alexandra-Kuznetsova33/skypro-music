@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setPlaylist } from '../../redux/playerSlice';
 import styles from './centerblock.module.css';
 import TrackItem from './TrackItem/TrackItem';
 import Search from '../Search/Search';
@@ -12,6 +14,7 @@ import {
   getUniqueAuthors,
   getUniqueGenres,
 } from '../../utils/helpers';
+import { AppDispatch } from '../../redux/store';
 
 type FilterKey = 'author' | 'year' | 'genre' | null;
 
@@ -25,6 +28,12 @@ export default function Centerblock({ tracks }: CenterblockProps) {
   const toggleFilter = (filter: Exclude<FilterKey, null>) => {
     setActiveFilter((prev) => (prev === filter ? null : filter));
   };
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(setPlaylist(tracks));
+  }, [tracks, dispatch]);
 
   return (
     <div className={styles.centerblock}>
