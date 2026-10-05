@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { setPlaylist } from '../../redux/playerSlice';
 import styles from './centerblock.module.css';
@@ -26,15 +26,23 @@ interface CenterblockProps {
 export default function Centerblock({ tracks, title = 'Треки' }: CenterblockProps) {
   const [activeFilter, setActiveFilter] = useState<FilterKey>(null);
 
-  const toggleFilter = (filter: Exclude<FilterKey, null>) => {
-    setActiveFilter((prev) => (prev === filter ? null : filter));
-  };
-
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     dispatch(setPlaylist(tracks));
   }, [tracks, dispatch]);
+
+  const uniqueAuthors = useMemo(() => getUniqueAuthors(tracks), [tracks]);
+  const uniqueGenres = useMemo(() => getUniqueGenres(tracks), [tracks]);
+  const yearOptions = useMemo(
+    () => ['По умолчанию', 'Сначала новые', 'Сначала старые'],
+    [],
+  );
+
+
+  const toggleFilter = useCallback((filter: Exclude<FilterKey, null>) => {
+    setActiveFilter((prev) => (prev === filter ? null : filter));
+  }, []);
 
   return (
     <div className={styles.centerblock}>
@@ -54,7 +62,7 @@ export default function Centerblock({ tracks, title = 'Треки' }: Centerbloc
           {activeFilter === 'author' && (
             <div className={styles.filter__list_wrapper}>
               <ul className={styles.filter__list}>
-                {getUniqueAuthors(tracks).map((item, idx) => (
+                {uniqueAuthors.map((item, idx) => (
                   <FilterItem key={idx} item={item} />
                 ))}
               </ul>
@@ -72,8 +80,7 @@ export default function Centerblock({ tracks, title = 'Треки' }: Centerbloc
           {activeFilter === 'year' && (
             <div className={styles.filter__list_wrapper}>
               <ul className={styles.filter__list}>
-                {['По умолчанию', 'Сначала новые', 'Сначала старые'].map(
-                  (item, idx) => (
+                {yearOptions.map((item, idx) => (
                     <FilterItem key={idx} item={item} />
                   ),
                 )}
@@ -91,7 +98,7 @@ export default function Centerblock({ tracks, title = 'Треки' }: Centerbloc
           {activeFilter === 'genre' && (
             <div className={styles.filter__list_wrapper}>
               <ul className={styles.filter__list}>
-                {getUniqueGenres(tracks).map((item, idx) => (
+                {uniqueGenres.map((item, idx) => (
                   <FilterItem key={idx} item={item} />
                 ))}
               </ul>

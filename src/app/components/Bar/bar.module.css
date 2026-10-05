@@ -162,6 +162,7 @@
 .trackPlay__like,
 .trackPlay__dislike {
   padding: 5px;
+  cursor: pointer;
 }
 
 .trackPlay__likeSvg {
@@ -169,6 +170,21 @@
   height: 12px;
   fill: transparent;
   stroke: #696969;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.trackPlay__likeSvg:hover {
+  stroke: #b672ff;
+}
+
+.trackPlay__likeSvg.liked {
+  fill: #b672ff;
+  stroke: #b672ff;
+}
+
+.trackPlay__likeSvg.liked use {
+  fill: #b672ff;
+  stroke: #b672ff;
 }
 
 .trackPlay__dislike {

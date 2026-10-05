@@ -7,6 +7,8 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { signin, getToken } from '../../services/auth/authApi';
 import styles from './signin.module.css';
+import { useAppDispatch } from '../../redux/hooks';
+import { setCredentials } from '../../redux/authSlice';
 
 export default function SigninPage() {
   const router = useRouter();
@@ -14,6 +16,7 @@ export default function SigninPage() {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
   const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -35,10 +38,15 @@ export default function SigninPage() {
     setIsLoading(true);
 
     try {
-      await signin({ email, password });
+      const user = await signin({ email, password });
       const tokens = await getToken({ email, password });
+
+      dispatch(setCredentials({ tokens, user }));
+
       localStorage.setItem('access', tokens.access);
       localStorage.setItem('refresh', tokens.refresh);
+      localStorage.setItem('user', JSON.stringify(user));
+
       router.push('/');
     } catch (error) {
       if (error instanceof AxiosError) {

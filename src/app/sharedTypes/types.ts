@@ -60,3 +60,13 @@ export interface SelectionType {
   owner: number | number[];
   __v: number;
 }
+
+export interface AuthState {
+  access: string;
+  refresh: string;
+  user: SigninResponse | null;
+}
+
+export interface TracksState {
+  favoriteTracks: TrackType[];
+}

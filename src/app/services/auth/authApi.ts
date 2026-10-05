@@ -34,3 +34,12 @@ export async function getToken(data: SigninRequest): Promise<TokenResponse> {
   );
   return res.data;
 }
+
+export async function refreshToken(refresh: string): Promise<{ access: string }> {
+  const res = await axios.post<{ access: string }>(
+    `${API_BASE_URL}/user/token/refresh/`,
+    { refresh },
+    { headers: { 'content-type': 'application/json' } },
+  );
+  return res.data;
+}
