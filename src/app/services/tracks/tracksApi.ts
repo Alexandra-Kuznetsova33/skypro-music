@@ -37,3 +37,31 @@ export async function getSelectionById(id: string | number): Promise<SelectionTy
   );
   return res.data.data;
 }
+
+export async function getFavoriteTracks(access: string): Promise<TrackType[]> {
+  const res = await axios.get<{ success: boolean; data: TrackType[] }>(
+    `${API_BASE_URL}/catalog/track/favorite/all/`,
+    { headers: { Authorization: `Bearer ${access}` } },
+  );
+  return res.data.data;
+}
+
+export async function addLike(
+  access: string,
+  id: number,
+): Promise<void> {
+  await axios.post(
+    `${API_BASE_URL}/catalog/track/${id}/favorite/`,
+    {},
+    { headers: { Authorization: `Bearer ${access}` } },
+  );
+}
+
+export async function removeLike(
+  access: string,
+  id: number,
+): Promise<void> {
+  await axios.delete(`${API_BASE_URL}/catalog/track/${id}/favorite/`, {
+    headers: { Authorization: `Bearer ${access}` },
+  });
+}

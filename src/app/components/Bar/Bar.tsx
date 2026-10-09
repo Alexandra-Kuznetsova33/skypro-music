@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, ChangeEvent } from 'react';
+import { useEffect, useRef, useState, useCallback, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 import { RootState } from '../../redux/store';
@@ -16,6 +16,7 @@ import {
 import ProgressBar from '../ProgressBar/ProgressBar';
 import { formatDuration } from '../../utils/helpers';
 import styles from './bar.module.css';
+import { useLikeTrack } from '../../hooks/useLikeTrack';
 
 export default function Bar() {
   const dispatch = useDispatch();
@@ -31,7 +32,8 @@ export default function Bar() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // смена трека и play/pause
+  const { isLike, errorMsg, toggleLike } = useLikeTrack(currentTrack);
+
   useEffect(() => {
     if (!audioRef.current || !currentTrack) return;
     if (audioRef.current.src !== currentTrack.track_file) {
@@ -46,55 +48,62 @@ export default function Bar() {
     }
   }, [currentTrack, isPlaying]);
 
-  // громкость
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
   }, [volume]);
 
-  // зацикливание
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.loop = loop;
     }
   }, [loop]);
 
-  if (!isPlayerVisible || !currentTrack) return null;
+  useEffect(() => {
+    if (errorMsg) {
+      console.warn('Ошибка лайка в плеере:', errorMsg);
+    }
+  }, [errorMsg]);
 
-  const handlePlayPause = () => dispatch(togglePlay());
-  const handleNext = () => dispatch(nextTrack());
-  const handlePrev = () => dispatch(prevTrack());
+  const handlePlayPause = useCallback(() => dispatch(togglePlay()), [dispatch]);
+  const handleNext = useCallback(() => dispatch(nextTrack()), [dispatch]);
+  const handlePrev = useCallback(() => dispatch(prevTrack()), [dispatch]);
 
-  const handleTimeUpdate = () => {
+  const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) setCurrentTime(audioRef.current.currentTime);
-  };
+  }, []);
 
-  const handleLoadedMetadata = () => {
+  const handleLoadedMetadata = useCallback(() => {
     if (audioRef.current) setDuration(audioRef.current.duration);
-  };
+  }, []);
 
-  const handleEnded = () => {
+  const handleEnded = useCallback(() => {
     if (loop) return;
-    const currentIndex = playlist.findIndex((t) => t._id === currentTrack._id);
+    const currentIndex = playlist.findIndex((t) => t._id === currentTrack?._id);
     if (shuffle || currentIndex < playlist.length - 1) {
       dispatch(nextTrack());
     } else {
       dispatch(setPlaying(false));
     }
-  };
+  }, [loop, playlist, currentTrack, shuffle, dispatch]);
 
-  const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const time = Number(e.target.value);
     if (audioRef.current) {
       audioRef.current.currentTime = time;
       setCurrentTime(time);
     }
-  };
+  }, []);
 
-  const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    dispatch(setVolume(Number(e.target.value)));
-  };
+  const handleVolumeChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      dispatch(setVolume(Number(e.target.value)));
+    },
+    [dispatch],
+  );
+
+  if (!isPlayerVisible || !currentTrack) return null;
 
   return (
     <div className={styles.bar}>
@@ -188,8 +197,15 @@ export default function Bar() {
               </div>
 
               <div className={styles.trackPlay__likeDis}>
-                <div className={`${styles.trackPlay__like} ${styles.btnIcon}`}>
-                  <svg className={styles.trackPlay__likeSvg}>
+                <div
+                  className={`${styles.trackPlay__like} ${styles.btnIcon}`}
+                  onClick={toggleLike}
+                >
+                  <svg
+                    className={classNames(styles.trackPlay__likeSvg, {
+                      [styles.liked]: isLike,
+                    })}
+                  >
                     <use href="/img/icon/sprite.svg#icon-like"></use>
                   </svg>
                 </div>
