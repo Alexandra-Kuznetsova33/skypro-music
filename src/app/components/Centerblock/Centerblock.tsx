@@ -14,10 +14,7 @@ import {
   getUniqueAuthors,
   getUniqueGenres,
 } from '../../utils/helpers';
-import {
-  applyFilters,
-  SortOption,
-} from '../../utils/filterHelpers';
+import { applyFilters, SortOption } from '../../utils/filterHelpers';
 
 type FilterKey = 'author' | 'year' | 'genre' | null;
 
@@ -39,8 +36,8 @@ export default function Centerblock({
   title = 'Треки',
 }: CenterblockProps) {
   const [activeFilter, setActiveFilter] = useState<FilterKey>(null);
-  const [selectedAuthor, setSelectedAuthor] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -56,12 +53,12 @@ export default function Centerblock({
   const filteredTracks = useMemo(
     () =>
       applyFilters(tracks, {
-        author: selectedAuthor,
-        genre: selectedGenre,
+        authors: selectedAuthors,
+        genres: selectedGenres,
         query: searchQuery,
         sort: sortOption,
       }),
-    [tracks, selectedAuthor, selectedGenre, searchQuery, sortOption],
+    [tracks, selectedAuthors, selectedGenres, searchQuery, sortOption],
   );
 
   const toggleFilter = useCallback((filter: Exclude<FilterKey, null>) => {
@@ -69,13 +66,17 @@ export default function Centerblock({
   }, []);
 
   const handleAuthorSelect = (author: string) => {
-    setSelectedAuthor((prev) => (prev === author ? '' : author));
-    setActiveFilter(null);
+    setSelectedAuthors((prev) =>
+      prev.includes(author)
+        ? prev.filter((a) => a !== author)
+        : [...prev, author],
+    );
   };
 
   const handleGenreSelect = (genre: string) => {
-    setSelectedGenre((prev) => (prev === genre ? '' : genre));
-    setActiveFilter(null);
+    setSelectedGenres((prev) =>
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre],
+    );
   };
 
   const handleSortSelect = (label: string) => {
@@ -100,6 +101,7 @@ export default function Centerblock({
             label="исполнителю"
             isActive={activeFilter === 'author'}
             onClick={() => toggleFilter('author')}
+            count={selectedAuthors.length}
           />
           {activeFilter === 'author' && (
             <div className={styles.filter__list_wrapper}>
@@ -109,7 +111,7 @@ export default function Centerblock({
                     key={item}
                     item={item}
                     onClick={handleAuthorSelect}
-                    isSelected={selectedAuthor === item}
+                    isSelected={selectedAuthors.includes(item)}
                   />
                 ))}
               </ul>
@@ -145,6 +147,7 @@ export default function Centerblock({
             label="жанру"
             isActive={activeFilter === 'genre'}
             onClick={() => toggleFilter('genre')}
+            count={selectedGenres.length}
           />
           {activeFilter === 'genre' && (
             <div className={styles.filter__list_wrapper}>
@@ -154,7 +157,7 @@ export default function Centerblock({
                     key={item}
                     item={item}
                     onClick={handleGenreSelect}
-                    isSelected={selectedGenre === item}
+                    isSelected={selectedGenres.includes(item)}
                   />
                 ))}
               </ul>

@@ -4,12 +4,13 @@ export type SortOption = 'default' | 'newest' | 'oldest';
 
 export function filterTracks(
   tracks: TrackType[],
-  author: string,
-  genre: string,
+  authors: string[],
+  genres: string[],
 ): TrackType[] {
   return tracks.filter((track) => {
-    const authorMatch = !author || track.author === author;
-    const genreMatch = !genre || track.genre.includes(genre);
+    const authorMatch = authors.length === 0 || authors.includes(track.author);
+    const genreMatch =
+      genres.length === 0 || track.genre.some((g) => genres.includes(g));
     return authorMatch && genreMatch;
   });
 }
@@ -36,14 +37,14 @@ export function sortTracks(
 export function applyFilters(
   tracks: TrackType[],
   options: {
-    author?: string;
-    genre?: string;
+    authors?: string[];
+    genres?: string[];
     query?: string;
     sort?: SortOption;
   },
 ): TrackType[] {
-  const { author = '', genre = '', query = '', sort = 'default' } = options;
-  let result = filterTracks(tracks, author, genre);
+  const { authors = [], genres = [], query = '', sort = 'default' } = options;
+  let result = filterTracks(tracks, authors, genres);
   result = searchTracks(result, query);
   result = sortTracks(result, sort);
   return result;
