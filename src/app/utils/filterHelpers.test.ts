@@ -48,26 +48,36 @@ const tracks = [trackA, trackB, trackC];
 
 describe('filterTracks', () => {
   it('возвращает все треки, если фильтры пустые', () => {
-    expect(filterTracks(tracks, '', '')).toEqual(tracks);
+    expect(filterTracks(tracks, [], [])).toEqual(tracks);
   });
 
-  it('фильтрует по автору', () => {
-    const result = filterTracks(tracks, 'Nero', '');
+  it('фильтрует по одному автору', () => {
+    const result = filterTracks(tracks, ['Nero'], []);
     expect(result).toEqual([trackA, trackC]);
   });
 
+  it('фильтрует по нескольким авторам (мультивыбор)', () => {
+    const result = filterTracks(tracks, ['Nero', 'Basta'], []);
+    expect(result).toEqual([trackA, trackB, trackC]);
+  });
+
   it('фильтрует по жанру', () => {
-    const result = filterTracks(tracks, '', 'pop');
+    const result = filterTracks(tracks, [], ['pop']);
     expect(result).toEqual([trackB]);
   });
 
-  it('фильтрует по автору и жанру одновременно', () => {
-    const result = filterTracks(tracks, 'Nero', 'rock');
+  it('фильтрует по нескольким жанрам', () => {
+    const result = filterTracks(tracks, [], ['pop', 'indie']);
+    expect(result).toEqual([trackB, trackC]);
+  });
+
+  it('фильтрует по авторам и жанрам одновременно', () => {
+    const result = filterTracks(tracks, ['Nero'], ['rock']);
     expect(result).toEqual([trackA, trackC]);
   });
 
   it('возвращает пустой массив, если ничего не совпало', () => {
-    const result = filterTracks(tracks, 'Nero', 'pop');
+    const result = filterTracks(tracks, ['Nero'], ['pop']);
     expect(result).toEqual([]);
   });
 });
@@ -110,23 +120,23 @@ describe('sortTracks', () => {
 });
 
 describe('applyFilters', () => {
-  it('применяет только фильтр по автору', () => {
-    const result = applyFilters(tracks, { author: 'Nero' });
+  it('применяет только фильтр по авторам', () => {
+    const result = applyFilters(tracks, { authors: ['Nero'] });
     expect(result).toEqual([trackA, trackC]);
   });
 
   it('применяет поиск + сортировку', () => {
-  const result = applyFilters(tracks, {
-    query: 'a',
-    sort: 'newest',
+    const result = applyFilters(tracks, {
+      query: 'a',
+      sort: 'newest',
+    });
+    expect(result.map((t) => t._id)).toEqual([1]);
   });
-  expect(result.map((t) => t._id)).toEqual([1]);
-});
 
   it('применяет всё вместе', () => {
     const result = applyFilters(tracks, {
-      author: 'Nero',
-      genre: 'rock',
+      authors: ['Nero'],
+      genres: ['rock'],
       query: 'gam',
       sort: 'newest',
     });
@@ -135,8 +145,8 @@ describe('applyFilters', () => {
 
   it('возвращает пустой массив, если ничего не подошло', () => {
     const result = applyFilters(tracks, {
-      author: 'Nero',
-      genre: 'pop',
+      authors: ['Nero'],
+      genres: ['pop'],
     });
     expect(result).toEqual([]);
   });
