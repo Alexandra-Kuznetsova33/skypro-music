@@ -14,7 +14,10 @@ import {
   getUniqueAuthors,
   getUniqueGenres,
 } from '../../utils/helpers';
-import { AppDispatch } from '../../redux/store';
+import {
+  applyFilters,
+  SortOption,
+} from '../../utils/filterHelpers';
 
 type FilterKey = 'author' | 'year' | 'genre' | null;
 
@@ -23,10 +26,25 @@ interface CenterblockProps {
   title?: string;
 }
 
-export default function Centerblock({ tracks, title = 'Треки' }: CenterblockProps) {
-  const [activeFilter, setActiveFilter] = useState<FilterKey>(null);
+const sortLabels: Record<SortOption, string> = {
+  default: 'По умолчанию',
+  newest: 'Сначала новые',
+  oldest: 'Сначала старые',
+};
 
-  const dispatch = useDispatch<AppDispatch>();
+const sortValues: SortOption[] = ['default', 'newest', 'oldest'];
+
+export default function Centerblock({
+  tracks,
+  title = 'Треки',
+}: CenterblockProps) {
+  const [activeFilter, setActiveFilter] = useState<FilterKey>(null);
+  const [selectedAuthor, setSelectedAuthor] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('');
+  const [sortOption, setSortOption] = useState<SortOption>('default');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(setPlaylist(tracks));
@@ -34,19 +52,43 @@ export default function Centerblock({ tracks, title = 'Треки' }: Centerbloc
 
   const uniqueAuthors = useMemo(() => getUniqueAuthors(tracks), [tracks]);
   const uniqueGenres = useMemo(() => getUniqueGenres(tracks), [tracks]);
-  const yearOptions = useMemo(
-    () => ['По умолчанию', 'Сначала новые', 'Сначала старые'],
-    [],
-  );
 
+  const filteredTracks = useMemo(
+    () =>
+      applyFilters(tracks, {
+        author: selectedAuthor,
+        genre: selectedGenre,
+        query: searchQuery,
+        sort: sortOption,
+      }),
+    [tracks, selectedAuthor, selectedGenre, searchQuery, sortOption],
+  );
 
   const toggleFilter = useCallback((filter: Exclude<FilterKey, null>) => {
     setActiveFilter((prev) => (prev === filter ? null : filter));
   }, []);
 
+  const handleAuthorSelect = (author: string) => {
+    setSelectedAuthor((prev) => (prev === author ? '' : author));
+    setActiveFilter(null);
+  };
+
+  const handleGenreSelect = (genre: string) => {
+    setSelectedGenre((prev) => (prev === genre ? '' : genre));
+    setActiveFilter(null);
+  };
+
+  const handleSortSelect = (label: string) => {
+    const entry = Object.entries(sortLabels).find(([, v]) => v === label);
+    if (entry) {
+      setSortOption(entry[0] as SortOption);
+    }
+    setActiveFilter(null);
+  };
+
   return (
     <div className={styles.centerblock}>
-      <Search />
+      <Search value={searchQuery} onChange={setSearchQuery} />
 
       <h2 className={styles.centerblock__h2}>{title}</h2>
 
@@ -62,8 +104,13 @@ export default function Centerblock({ tracks, title = 'Треки' }: Centerbloc
           {activeFilter === 'author' && (
             <div className={styles.filter__list_wrapper}>
               <ul className={styles.filter__list}>
-                {uniqueAuthors.map((item, idx) => (
-                  <FilterItem key={idx} item={item} />
+                {uniqueAuthors.map((item) => (
+                  <FilterItem
+                    key={item}
+                    item={item}
+                    onClick={handleAuthorSelect}
+                    isSelected={selectedAuthor === item}
+                  />
                 ))}
               </ul>
             </div>
@@ -80,10 +127,14 @@ export default function Centerblock({ tracks, title = 'Треки' }: Centerbloc
           {activeFilter === 'year' && (
             <div className={styles.filter__list_wrapper}>
               <ul className={styles.filter__list}>
-                {yearOptions.map((item, idx) => (
-                    <FilterItem key={idx} item={item} />
-                  ),
-                )}
+                {sortValues.map((value) => (
+                  <FilterItem
+                    key={value}
+                    item={sortLabels[value]}
+                    onClick={handleSortSelect}
+                    isSelected={sortOption === value}
+                  />
+                ))}
               </ul>
             </div>
           )}
@@ -98,8 +149,13 @@ export default function Centerblock({ tracks, title = 'Треки' }: Centerbloc
           {activeFilter === 'genre' && (
             <div className={styles.filter__list_wrapper}>
               <ul className={styles.filter__list}>
-                {uniqueGenres.map((item, idx) => (
-                  <FilterItem key={idx} item={item} />
+                {uniqueGenres.map((item) => (
+                  <FilterItem
+                    key={item}
+                    item={item}
+                    onClick={handleGenreSelect}
+                    isSelected={selectedGenre === item}
+                  />
                 ))}
               </ul>
             </div>
@@ -125,13 +181,17 @@ export default function Centerblock({ tracks, title = 'Треки' }: Centerbloc
           </div>
         </div>
         <div className={styles.content__playlist}>
-          {tracks.map((track) => (
-            <TrackItem
-              key={track._id}
-              track={track}
-              time={formatDuration(track.duration_in_seconds)}
-            />
-          ))}
+          {filteredTracks.length === 0 ? (
+            <div className={styles.empty}>Нет подходящих треков</div>
+          ) : (
+            filteredTracks.map((track) => (
+              <TrackItem
+                key={track._id}
+                track={track}
+                time={formatDuration(track.duration_in_seconds)}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
