@@ -9,3 +9,8 @@
   text-decoration: underline;
   transition: color 0.5s ease;
 }
+
+.selected {
+  color: #b672ff;
+  text-decoration: underline;
+}
