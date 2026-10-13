@@ -9,6 +9,7 @@ import { RootState } from '../../../redux/store';
 import classNames from 'classnames';
 import { TrackType } from '../../../sharedTypes/types';
 import { useLikeTrack } from '../../../hooks/useLikeTrack';
+import { toast } from 'react-toastify';
 
 interface TrackItemProps {
   track: TrackType;
@@ -29,7 +30,7 @@ export default function TrackItem({ track, time }: TrackItemProps) {
 
   useEffect(() => {
     if (errorMsg) {
-      alert(errorMsg);
+      toast.error(errorMsg);
     }
   }, [errorMsg]);
 

@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AxiosError } from 'axios';
 import Centerblock from './components/Centerblock/Centerblock';
 import MainLayout from './components/MainLayout/MainLayout';
 import { getTracks } from './services/tracks/tracksApi';
 import { TrackType } from './sharedTypes/types';
 import styles from './page.module.css';
+import { getApiErrorMessage } from './utils/handleApiError';
 
 export default function Home() {
   const [tracks, setTracks] = useState<TrackType[]>([]);
@@ -17,29 +17,17 @@ export default function Home() {
     getTracks()
       .then((res) => setTracks(res))
       .catch((error) => {
-        if (error instanceof AxiosError) {
-          if (error.response) {
-            setError(error.response.data?.message || 'Ошибка при получении треков');
-          } else if (error.request) {
-            setError('Нет соединения с сервером');
-          } else {
-            setError('Неизвестная ошибка');
-          }
-        } else {
-          setError('Неизвестная ошибка');
-        }
+        setError(getApiErrorMessage(error, 'Ошибка при получении треков'));
       })
       .finally(() => setIsLoading(false));
   }, []);
 
   return (
-    <MainLayout>
-      {isLoading ? (
-        <div className={styles.loading}>Загрузка треков...</div>
-      ) : error ? (
+    <MainLayout showSkeleton={isLoading}>
+      {error ? (
         <div className={styles.error}>{error}</div>
       ) : (
-        <Centerblock tracks={tracks} />
+        <Centerblock tracks={tracks} isLoading={isLoading} title="Треки" />
       )}
     </MainLayout>
   );

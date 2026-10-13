@@ -1,15 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { AxiosError } from 'axios';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import {
-  addLikedTracks,
-  removeLikedTracks,
-} from '../redux/tracksSlice';
+import { addLikedTracks, removeLikedTracks } from '../redux/tracksSlice';
 import { addLike, removeLike } from '../services/tracks/tracksApi';
 import { withReauth } from '../utils/withReauth';
 import { TrackType } from '../sharedTypes/types';
+import { toast } from 'react-toastify';
+import { getApiErrorMessage } from '../utils/handleApiError';
 
 interface UseLikeTrackReturn {
   isLoading: boolean;
@@ -48,19 +46,12 @@ export const useLikeTrack = (track: TrackType | null): UseLikeTrackReturn => {
     )
       .then(() => {
         dispatch(actionSlice(track));
+        toast.success(
+          isLike ? 'Удалено из избранного' : 'Добавлено в избранное',
+        );
       })
       .catch((error) => {
-        if (error instanceof AxiosError) {
-          if (error.response) {
-            setErrorMsg(error.response.data?.message || 'Ошибка при лайке');
-          } else if (error.request) {
-            setErrorMsg('Произошла ошибка. Попробуйте позже');
-          } else {
-            setErrorMsg('Неизвестная ошибка');
-          }
-        } else {
-          setErrorMsg('Неизвестная ошибка');
-        }
+        setErrorMsg(getApiErrorMessage(error, 'Ошибка при лайке'));
       })
       .finally(() => {
         setIsLoading(false);

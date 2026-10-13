@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AxiosError } from 'axios';
 import Centerblock from '../components/Centerblock/Centerblock';
 import MainLayout from '../components/MainLayout/MainLayout';
 import { getFavoriteTracks } from '../services/tracks/tracksApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { setFavoriteTracks } from '../redux/tracksSlice';
 import styles from '../page.module.css';
+import { getApiErrorMessage } from '../utils/handleApiError';
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -30,28 +30,10 @@ export default function FavoritesPage() {
         dispatch(setFavoriteTracks(tracks));
       })
       .catch((error) => {
-        if (error instanceof AxiosError) {
-          if (error.response) {
-            setError(error.response.data?.message || 'Ошибка при получении избранного');
-          } else if (error.request) {
-            setError('Нет соединения с сервером');
-          } else {
-            setError('Неизвестная ошибка');
-          }
-        } else {
-          setError('Неизвестная ошибка');
-        }
+        setError(getApiErrorMessage(error, 'Ошибка при получении избранного'));
       })
       .finally(() => setIsLoading(false));
   }, [access, dispatch, router]);
-
-  if (isLoading) {
-    return (
-      <MainLayout>
-        <div className={styles.loading}>Загрузка избранного...</div>
-      </MainLayout>
-    );
-  }
 
   if (error) {
     return (
@@ -62,8 +44,16 @@ export default function FavoritesPage() {
   }
 
   return (
-    <MainLayout>
-      <Centerblock tracks={favoriteTracks} title="Мои треки" />
+    <MainLayout showSkeleton={isLoading}>
+      {error ? (
+        <div className={styles.error}>{error}</div>
+      ) : (
+        <Centerblock
+          tracks={favoriteTracks}
+          title="Мои треки"
+          isLoading={isLoading}
+        />
+      )}
     </MainLayout>
   );
 }
