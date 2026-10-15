@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AxiosError } from 'axios';
 import classNames from 'classnames';
 import { signup } from '../../services/auth/authApi';
 import styles from './signup.module.css';
+import { getApiErrorMessage } from '../../utils/handleApiError';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -48,19 +48,7 @@ export default function SignupPage() {
       await signup({ email, password, username });
       router.push('/auth/signin');
     } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response) {
-          setErrorMessage(
-            error.response.data?.message || 'Ошибка при регистрации',
-          );
-        } else if (error.request) {
-          setErrorMessage('Нет соединения с сервером');
-        } else {
-          setErrorMessage('Неизвестная ошибка');
-        }
-      } else {
-        setErrorMessage('Неизвестная ошибка');
-      }
+      setErrorMessage(getApiErrorMessage(error, 'Ошибка при регистрации'));
     } finally {
       setIsLoading(false);
     }

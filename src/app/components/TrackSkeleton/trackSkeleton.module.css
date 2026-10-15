@@ -1,0 +1,39 @@
+.playlist__item {
+  width: 100%;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.playlist__track {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.track__title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 447px;
+  gap: 17px;
+}
+
+.track__author {
+  width: 321px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.track__album {
+  width: 245px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.track__time {
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

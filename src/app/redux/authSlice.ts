@@ -5,6 +5,7 @@ const initialState: AuthState = {
   access: '',
   refresh: '',
   user: null,
+  isInitialized: false,
 };
 
 const authSlice = createSlice({
@@ -22,6 +23,11 @@ const authSlice = createSlice({
     setAccessToken(state, action: PayloadAction<string>) {
       state.access = action.payload;
     },
+
+    setInitialized(state) {
+      state.isInitialized = true;
+    },
+    
     clearCredentials(state) {
       state.access = '';
       state.refresh = '';
@@ -30,5 +36,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, setAccessToken, clearCredentials } = authSlice.actions;
+export const { setCredentials, setAccessToken, setInitialized, clearCredentials } = authSlice.actions;
 export default authSlice.reducer;

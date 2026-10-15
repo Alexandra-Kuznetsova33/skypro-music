@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AxiosError } from 'axios';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { signin, getToken } from '../../services/auth/authApi';
 import styles from './signin.module.css';
 import { useAppDispatch } from '../../redux/hooks';
 import { setCredentials } from '../../redux/authSlice';
+import { getApiErrorMessage } from '../../utils/handleApiError';
 
 export default function SigninPage() {
   const router = useRouter();
@@ -49,19 +49,7 @@ export default function SigninPage() {
 
       router.push('/');
     } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response) {
-          setErrorMessage(
-            error.response.data?.message || 'Ошибка при авторизации',
-          );
-        } else if (error.request) {
-          setErrorMessage('Нет соединения с сервером');
-        } else {
-          setErrorMessage('Неизвестная ошибка');
-        }
-      } else {
-        setErrorMessage('Неизвестная ошибка');
-      }
+      setErrorMessage(getApiErrorMessage(error, 'Ошибка при авторизации'));
     } finally {
       setIsLoading(false);
     }

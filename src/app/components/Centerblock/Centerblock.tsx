@@ -15,12 +15,14 @@ import {
   getUniqueGenres,
 } from '../../utils/helpers';
 import { applyFilters, SortOption } from '../../utils/filterHelpers';
+import TrackSkeleton from '../TrackSkeleton/TrackSkeleton';
 
 type FilterKey = 'author' | 'year' | 'genre' | null;
 
 interface CenterblockProps {
   tracks: TrackType[];
   title?: string;
+  isLoading?: boolean;
 }
 
 const sortLabels: Record<SortOption, string> = {
@@ -33,7 +35,8 @@ const sortValues: SortOption[] = ['default', 'newest', 'oldest'];
 
 export default function Centerblock({
   tracks,
-  title = 'Треки',
+  title,
+  isLoading = false,
 }: CenterblockProps) {
   const [activeFilter, setActiveFilter] = useState<FilterKey>(null);
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
@@ -90,8 +93,11 @@ export default function Centerblock({
   return (
     <div className={styles.centerblock}>
       <Search value={searchQuery} onChange={setSearchQuery} />
-
-      <h2 className={styles.centerblock__h2}>{title}</h2>
+      {title ? (
+        <h2 className={styles.centerblock__h2}>{title}</h2>
+      ) : (
+        <div className={styles.centerblock__h2Placeholder} />
+      )}
 
       <div className={styles.centerblock__filter}>
         <div className={styles.filter__title}>Искать по:</div>
@@ -184,7 +190,9 @@ export default function Centerblock({
           </div>
         </div>
         <div className={styles.content__playlist}>
-          {filteredTracks.length === 0 ? (
+          {isLoading ? (
+            Array.from({ length: 8 }).map((_, i) => <TrackSkeleton key={i} />)
+          ) : filteredTracks.length === 0 ? (
             <div className={styles.empty}>Нет подходящих треков</div>
           ) : (
             filteredTracks.map((track) => (

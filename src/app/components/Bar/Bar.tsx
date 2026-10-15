@@ -17,12 +17,15 @@ import ProgressBar from '../ProgressBar/ProgressBar';
 import { formatDuration } from '../../utils/helpers';
 import styles from './bar.module.css';
 import { useLikeTrack } from '../../hooks/useLikeTrack';
+import { toast } from 'react-toastify';
 
 export default function Bar() {
   const dispatch = useDispatch();
   const currentTrack = useSelector((s: RootState) => s.player.currentTrack);
   const isPlaying = useSelector((s: RootState) => s.player.isPlaying);
-  const isPlayerVisible = useSelector((s: RootState) => s.player.isPlayerVisible);
+  const isPlayerVisible = useSelector(
+    (s: RootState) => s.player.isPlayerVisible,
+  );
   const playlist = useSelector((s: RootState) => s.player.playlist);
   const shuffle = useSelector((s: RootState) => s.player.shuffle);
   const loop = useSelector((s: RootState) => s.player.loop);
@@ -62,7 +65,7 @@ export default function Bar() {
 
   useEffect(() => {
     if (errorMsg) {
-      console.warn('Ошибка лайка в плеере:', errorMsg);
+      toast.error(errorMsg);
     }
   }, [errorMsg]);
 
@@ -115,7 +118,9 @@ export default function Bar() {
       />
       <div className={styles.bar__content}>
         <div className={styles.bar__progressBlock}>
-          <span className={styles.bar__time}>{formatDuration(currentTime)}</span>
+          <span className={styles.bar__time}>
+            {formatDuration(currentTime)}
+          </span>
           <div className={styles.bar__progressWrapper}>
             <ProgressBar
               max={duration || 0}
@@ -156,9 +161,13 @@ export default function Bar() {
                 </svg>
               </div>
               <div
-                className={classNames(styles.player__btnRepeat, styles.btnIcon, {
-                  [styles.active]: loop,
-                })}
+                className={classNames(
+                  styles.player__btnRepeat,
+                  styles.btnIcon,
+                  {
+                    [styles.active]: loop,
+                  },
+                )}
                 onClick={() => dispatch(toggleLoop())}
               >
                 <svg className={styles.player__btnRepeatSvg}>
@@ -166,9 +175,13 @@ export default function Bar() {
                 </svg>
               </div>
               <div
-                className={classNames(styles.player__btnShuffle, styles.btnIcon, {
-                  [styles.active]: shuffle,
-                })}
+                className={classNames(
+                  styles.player__btnShuffle,
+                  styles.btnIcon,
+                  {
+                    [styles.active]: shuffle,
+                  },
+                )}
                 onClick={() => dispatch(toggleShuffle())}
               >
                 <svg className={styles.player__btnShuffleSvg}>
@@ -209,7 +222,9 @@ export default function Bar() {
                     <use href="/img/icon/sprite.svg#icon-like"></use>
                   </svg>
                 </div>
-                <div className={`${styles.trackPlay__dislike} ${styles.btnIcon}`}>
+                <div
+                  className={`${styles.trackPlay__dislike} ${styles.btnIcon}`}
+                >
                   <svg className={styles.trackPlay__dislikeSvg}>
                     <use href="/img/icon/sprite.svg#icon-dislike"></use>
                   </svg>

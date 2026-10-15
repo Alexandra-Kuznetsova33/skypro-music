@@ -155,3 +155,8 @@
   padding: 40px 20px;
   text-align: center;
 }
+
+.centerblock__h2Placeholder {
+  height: 72px;
+  margin-bottom: 45px;
+}

@@ -27,6 +27,10 @@
   color: #ffffff;
 }
 
+.search__text:focus-visible {
+    outline: none;
+}
+
 .search__text::placeholder {
   background-color: transparent;
   color: #ffffff;

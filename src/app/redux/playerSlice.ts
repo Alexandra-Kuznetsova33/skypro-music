@@ -68,7 +68,7 @@ const playerSlice = createSlice({
       const currentIndex = state.playlist.findIndex(
         (t) => t._id === state.currentTrack!._id,
       );
-      if (currentIndex <= 0) return; // на первом треке ничего не делаем
+      if (currentIndex <= 0) return;
 
       state.currentTrack = state.playlist[currentIndex - 1];
       state.isPlaying = true;
