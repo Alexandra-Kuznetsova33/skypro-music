@@ -65,6 +65,7 @@ export interface AuthState {
   access: string;
   refresh: string;
   user: SigninResponse | null;
+  isInitialized: boolean;
 }
 
 export interface TracksState {

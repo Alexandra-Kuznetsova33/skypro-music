@@ -13,13 +13,15 @@ import { getApiErrorMessage } from '../utils/handleApiError';
 export default function FavoritesPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { access } = useAppSelector((state) => state.auth);
+  const { access, isInitialized } = useAppSelector((state) => state.auth);
   const favoriteTracks = useAppSelector((state) => state.tracks.favoriteTracks);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (!isInitialized) return;
+
     if (!access) {
       router.push('/auth/signin');
       return;
@@ -33,7 +35,15 @@ export default function FavoritesPage() {
         setError(getApiErrorMessage(error, 'Ошибка при получении избранного'));
       })
       .finally(() => setIsLoading(false));
-  }, [access, dispatch, router]);
+  }, [access, isInitialized, dispatch, router]);
+
+    if (!isInitialized) {
+    return (
+      <MainLayout showSkeleton>
+        <Centerblock tracks={[]} title="Мои треки" isLoading />
+      </MainLayout>
+    );
+  }
 
   if (error) {
     return (
